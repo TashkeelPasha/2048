@@ -1,0 +1,287 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+
+#define size 4
+#define ESC 27
+#define UP 72
+#define DOWN 80
+#define LEFT 75
+#define RIGHT 77
+
+int board[size][size] = {0}; // Initializing  the game board to zeros
+int score = 2, last = 0; // Initialize score and last variables
+
+void starting(); 
+void Display(); 
+void Action(char Arrow); 
+void Down(); 
+void Up();
+void Left(); 
+void Right();
+void Random_creater(); 
+int Temp_counter(); 
+void Starting_Random();
+void New_Game(); 
+// Function to display game instructions and start the game
+void starting(){
+    printf("***************************************************\n");
+    printf("\t\t   2048 GAME\n");
+    printf("\nINSTRUCTION:\n\n");
+    printf("-> Enter arrow keys to move (up, down, left, right)\n\n");
+    printf("-> For winning this game any one box has value 2048\n\n");
+    printf("-> You have a maximum of 2048 tries to win the game\n\n");
+    printf("-> For New game press \"1\"\n\n");
+    printf("-> For Quit this game press Esc button\n\n");
+    printf("***************************************************\n");
+    printf("\tPRESS ANY KEY TO PLAY\n");
+    getch(); // Wait for a key press
+    Display(); // Display the initial state of the game
+}
+// Function to display the current game state
+void Display(){
+    int i, j;
+    system("cls"); // Clear the console screen
+    printf("***************************************************\n");
+    printf("\t\t   2048 GAME\n");
+    printf("\nINSTRUCTION:\n\n");
+    printf("-> Enter arrow keys to move (up, down, left, right)\n\n");
+    printf("-> For winning this game any one box has value 2048\n\n");
+    printf("-> You have a maximum of 2048 tries to win the game\n\n");
+    printf("-> For New game press \"1\"\n\n");
+    printf("-> For Quit this game press Esc button\n\n");
+    printf("***************************************************\n");
+    printf("\n\t\t\t\t\t\t SCORE  : %d\n\n\n\n", score);
+    // Print the game board
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            if (board[i][j] == 0)
+                printf("   .   "); // Print a dot for an empty cell
+            else
+                printf("%4d   ", board[i][j]); // Print the value of the cell
+        }
+        printf("\n");
+    }
+}
+// Function to generate a random tile
+void Random_creater() {
+    int temp1, temp2, add;
+    temp1 = rand() % size; // Generate a random row index
+    temp2 = rand() % size; // Generate a random column index
+    add = ((temp1 + temp2) % 2 == 0) ? 2 : 4; // Randomly choose between 2 and 4
+    if (board[temp1][temp2] == 0) {
+        board[temp1][temp2] = add; // Place the randomly generated value at the random position
+        score += 2;
+    }
+}
+// Function to handle player actions
+void Action(char Arrow){
+	char a,b;
+    switch(Arrow){
+    	case '1':
+    		printf("\nAre you sure you want new game? (y/n): ");
+            scanf("%c",&a);
+            if (a == 'y' || a == 'Y') {
+                New_Game(); // for new game
+            }
+			else if (a == 'n' || a == 'N'){
+			printf("Enter arrow key to proceed game ");
+                Arrow = getch();
+            }
+            break; {	
+            }
+        case UP:
+            Up(); // Move key up
+            break;
+        case DOWN:
+            Down(); // Move key down
+            break;
+        case LEFT:
+            Left(); // Move key left
+            break;
+        case RIGHT:
+            Right(); // Move key right
+            break;
+        case ESC:
+            printf("\nAre you sure you want to quit? (y/n): ");
+            scanf("%c",&b);
+            if (b == 'y' || b == 'Y') {
+                exit(0);
+            }
+			else if (b == 'n' || b == 'N'){
+				printf("Enter arrow key to proceed game ");
+                Arrow = getch();
+            }
+            break;
+        default:
+            return; // Do nothing for other keys
+    } 
+    last++;
+    Random_creater(); 
+    Display();
+}
+// Function to initialize the game board with two random tiles
+void Starting_Random(){
+    board[0][1] = 2;
+    board[1][2] = 2;
+    Display();
+}
+void New_Game() {
+    score = 0;
+    last = 0;
+    // Clear the game board
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            board[i][j] = 0;
+        }
+    }
+}
+// Function to check game conditions
+int Temp_counter(){
+    int temp = 0, i, j;
+    for (i = 0; i < size; i++) {
+        for (j = 0; j < size; j++) {
+            if (board[i][j] == 2048)
+                return 1; // Player won if any cell has a value of 2048
+            if (board[i][j] == 0)
+                temp = 1; // Game can continue if there is an empty cell
+        }
+    }
+    if (temp == 1) {
+        last = 0; // Reset last variable
+        return -1; // Continue the game
+    } else if (last == 1) {
+        return 0; // Game over condition
+    }
+    last = 1;
+    return -1; // Continue the game
+}
+// Function to move key down
+void Down(){
+    int i, j;
+    for (j = 0; j < size; j++) {
+        i = 2;
+        while (1) {
+            while (board[i][j] == 0) {
+                if (i == -1)
+                    break;
+                i--;
+            }
+            if (i == -1)
+                break;
+            while (i < size - 1 && (board[i + 1][j] == 0 || board[i][j] == board[i + 1][j])) {
+                board[i + 1][j] += board[i][j];
+                board[i][j] = 0;
+                i++;
+            }
+            i--;
+        }
+    }
+}
+// Function to move key up
+void Up(){
+    int i, j;
+    for (j = 0; j < size; j++) {
+        i = 1;
+        while (1) {
+            while (board[i][j] == 0) {
+                if (i == size)
+                    break;
+                i++;
+            }
+            if (i == size)
+                break;
+            while (i > 0 && (board[i - 1][j] == 0 || board[i][j] == board[i - 1][j])) {
+                board[i - 1][j] += board[i][j];
+                board[i][j] = 0;
+                i--;
+            }
+            i++;
+        }
+    }
+}
+// Function to move key right
+void Right(){
+    int i, j;
+    for (i = 0; i < size; i++) {
+        j = 2;
+        while (1) {
+            while (board[i][j] == 0) {
+                if (j == -1)
+                    break;
+                j--;
+            }
+            if (j == -1)
+                break;
+            while (j < size - 1 && (board[i][j + 1] == 0 || board[i][j] == board[i][j + 1])) {
+                board[i][j + 1] += board[i][j];
+                board[i][j] = 0;
+                j++;
+            }
+            j--;
+        }
+    }
+}
+// Function to move key left
+void Left(){
+    int i, j;
+    for (i = 0; i < size; i++) {
+        j = 1;
+        while (1) {
+            while (board[i][j] == 0) {
+                if (j == size)
+                    break;
+                j++;
+            }
+            if (j == size)
+                break;
+            while (j > 0 && (board[i][j - 1] == 0 || board[i][j] == board[i][j - 1])) {
+                board[i][j - 1] += board[i][j];
+                board[i][j] = 0;
+                j--;
+            }
+            j++;
+        }
+    }
+}
+int main (){
+    char Arrow;
+    int i,j;    
+    while (board[i][j] = 0 || last < 2048) {
+     system("cls");   	
+        starting(); // Display game instructions and start the game
+        Starting_Random(); 
+        Arrow = DOWN; 
+        while (1) {
+            Arrow = getch(); // Get user input
+            Action(Arrow); 
+            int temp = Temp_counter(); // Check game conditions
+            // Check if the player won
+            if (temp == 1) {
+                printf("\n\t\t\tYOU WON");
+                printf("\n\n\t\t\t\tYOUR SCORE is  : %d", score);
+                break;
+            }
+            // Check if the game is over
+            if (temp == 0) {
+                system("cls");
+                printf("\nSORRY! YOU LOSS\n");
+                printf("\nYOUR SCORE is  : %d", score);
+                printf("\nTHANKS FOR PLAYING, GOOD LUCK FOR NEXT TIME ");
+                break;
+            }
+        }
+        char c;
+		printf("\n\nDo you want to play again? (y/n): ");
+		scanf("%c",&c);
+        if (c != 'y' && c != 'Y') {
+            break;
+        }
+        New_Game();
+    }
+
+    if (last == 2048){
+    	printf("\nMaximum number of tries reached. GAME OVER!\n");
+	}
+    return 0;
+}
